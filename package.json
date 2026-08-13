@@ -1,0 +1,30 @@
+{
+  "name": "arr-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for managing a self-hosted media stack (Radarr, Sonarr, qBittorrent, Plex, Overseerr)",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "arr-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": ["mcp", "radarr", "sonarr", "plex", "qbittorrent", "overseerr", "homelab"],
+  "author": "alexscdt",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
