@@ -19,6 +19,7 @@ import { handleAddMovie, addMovieToolDefinition } from './tools/add_movie.js'
 import { handleSearchSeries, searchSeriesToolDefinition } from './tools/search_series.js'
 import { handleAddSeries, addSeriesToolDefinition } from './tools/add_series.js'
 import { handleListDownloads, listDownloadsToolDefinition } from './tools/list_downloads.js'
+import { handleGetLibrary, getLibraryToolDefinition } from './tools/get_library.js'
 
 const packageJsonSchema = z.object({
     name: z.string().min(1),
@@ -54,7 +55,8 @@ server.setRequestHandler(ListToolsRequestSchema, async (): Promise<ListToolsResu
         addMovieToolDefinition,
         searchSeriesToolDefinition,
         addSeriesToolDefinition,
-        listDownloadsToolDefinition
+        listDownloadsToolDefinition,
+        getLibraryToolDefinition
     ]
 }))
 
@@ -97,6 +99,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
             }
             case 'list_downloads': {
                 const result = await handleListDownloads(args)
+                return {
+                    content: [{ type: 'text', text: result }]
+                }
+            }
+            case 'get_library': {
+                const result = await handleGetLibrary(args)
                 return {
                     content: [{ type: 'text', text: result }]
                 }
