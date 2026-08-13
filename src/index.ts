@@ -11,8 +11,11 @@ import {
     type ListToolsResult
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
-import { config } from './config'
-import { handlePing, pingToolDefinition } from './tools/ping'
+import { config } from './config.js'
+
+import { handlePing, pingToolDefinition } from './tools/ping.js'
+import { handleSearchMovie, searchMovieToolDefinition } from './tools/search_movie.js'
+import { handleAddMovie, addMovieToolDefinition } from './tools/add_movie.js'
 
 const packageJsonSchema = z.object({
     name: z.string().min(1),
@@ -42,8 +45,10 @@ const server = new Server(
 )
 
 server.setRequestHandler(ListToolsRequestSchema, async (): Promise<ListToolsResult> => ({
-    tools: [pingToolDefinition]
+    tools: [pingToolDefinition, searchMovieToolDefinition, addMovieToolDefinition]
 }))
+
+
 
 server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToolResult> => {
     const { name, arguments: args } = request.params
@@ -51,7 +56,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
     try {
         switch (name) {
             case 'ping': {
-                const result = await handlePing(args)
+                const result: string = await handlePing(args)
+                return {
+                    content: [{ type: 'text', text: result }]
+                }
+            }
+            case 'search_movie': {
+                const result: string = await handleSearchMovie(args)
+                return {
+                    content: [{ type: 'text', text: result }]
+                }
+            }
+            case 'add_movie': {
+                const result: string = await handleAddMovie(args)
                 return {
                     content: [{ type: 'text', text: result }]
                 }
@@ -63,7 +80,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
                 }
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
+        const message: string = error instanceof Error ? error.message : String(error)
         return {
             content: [{ type: 'text', text: `Error executing ${name}: ${message}` }],
             isError: true
