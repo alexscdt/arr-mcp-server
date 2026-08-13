@@ -16,6 +16,8 @@ import { config } from './config.js'
 import { handlePing, pingToolDefinition } from './tools/ping.js'
 import { handleSearchMovie, searchMovieToolDefinition } from './tools/search_movie.js'
 import { handleAddMovie, addMovieToolDefinition } from './tools/add_movie.js'
+import { handleSearchSeries, searchSeriesToolDefinition } from './tools/search_series.js'
+import { handleAddSeries, addSeriesToolDefinition } from './tools/add_series.js'
 
 const packageJsonSchema = z.object({
     name: z.string().min(1),
@@ -45,7 +47,13 @@ const server = new Server(
 )
 
 server.setRequestHandler(ListToolsRequestSchema, async (): Promise<ListToolsResult> => ({
-    tools: [pingToolDefinition, searchMovieToolDefinition, addMovieToolDefinition]
+    tools: [
+        pingToolDefinition,
+        searchMovieToolDefinition,
+        addMovieToolDefinition,
+        searchSeriesToolDefinition,
+        addSeriesToolDefinition
+    ]
 }))
 
 
@@ -69,6 +77,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
             }
             case 'add_movie': {
                 const result: string = await handleAddMovie(args)
+                return {
+                    content: [{ type: 'text', text: result }]
+                }
+            }
+            case 'search_series': {
+                const result = await handleSearchSeries(args)
+                return {
+                    content: [{ type: 'text', text: result }]
+                }
+            }
+            case 'add_series': {
+                const result = await handleAddSeries(args)
                 return {
                     content: [{ type: 'text', text: result }]
                 }
