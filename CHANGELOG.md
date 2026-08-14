@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.1...v1.0.2) (2026-08-14)
+
+
+### Bug Fixes
+
+* count actively uploading torrents as seeding and fix ETA roundin… ([bf462d8](https://github.com/alexscdt/arr-mcp-server/commit/bf462d860e89e62b0cce25697c1825972052d3c9))
+* count actively uploading torrents as seeding and fix ETA rounding at the hour mark ([019c680](https://github.com/alexscdt/arr-mcp-server/commit/019c680b2e41395048fff0035ca83443cc0ef237))
+
 ## [1.0.1](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.0...v1.0.1) (2026-08-14)
 
 
