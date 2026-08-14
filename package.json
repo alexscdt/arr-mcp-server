@@ -7,6 +7,17 @@
   "bin": {
     "arr-mcp-server": "dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexscdt/arr-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexscdt/arr-mcp-server/issues"
+  },
+  "homepage": "https://github.com/alexscdt/arr-mcp-server#readme",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/postbuild.mjs",
     "dev": "tsx watch src/index.ts",
