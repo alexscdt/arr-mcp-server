@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { HttpClient } from './base.js'
-import { config } from '../config.js'
+import { getConfig } from '../config.js'
 
 const qbittorrentTorrentSchema = z.object({
     hash: z.string(),
@@ -24,17 +24,32 @@ const qbittorrentTorrentSchema = z.object({
 
 export type QbittorrentTorrent = z.infer<typeof qbittorrentTorrentSchema>
 
+export interface QbittorrentClientOptions {
+    url: string
+    username: string
+    password: string
+}
+
 export class QbittorrentClient {
-    private readonly http: HttpClient
+    private _http?: HttpClient
     private cookie: string | null = null
     private lastAuthAt: number = 0
     private readonly authTtlMs: number = 30 * 60 * 1000
 
-    constructor() {
-        this.http = new HttpClient({
-            baseUrl: config.qbittorrent.url,
-            timeoutMs: 15000
-        })
+    constructor(private readonly options?: QbittorrentClientOptions) {}
+
+    private get creds(): QbittorrentClientOptions {
+        return this.options ?? getConfig().qbittorrent
+    }
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            this._http = new HttpClient({
+                baseUrl: this.creds.url,
+                timeoutMs: 15000
+            })
+        }
+        return this._http
     }
 
     private async ensureAuthenticated(): Promise<void> {
@@ -44,15 +59,15 @@ export class QbittorrentClient {
         }
 
         const params = new URLSearchParams({
-            username: config.qbittorrent.username,
-            password: config.qbittorrent.password
+            username: this.creds.username,
+            password: this.creds.password
         })
 
-        const response = await fetch(`${config.qbittorrent.url}/api/v2/auth/login`, {
+        const response = await fetch(`${this.creds.url}/api/v2/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                Referer: config.qbittorrent.url
+                Referer: this.creds.url
             },
             body: params.toString()
         })

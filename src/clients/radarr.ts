@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { HttpClient } from './base.js'
-import { config } from '../config.js'
+import { getConfig } from '../config.js'
 
 const radarrMovieLookupSchema = z.object({
     tmdbId: z.number(),
@@ -83,16 +83,27 @@ export interface AddMovieOptions {
     minimumAvailability?: 'announced' | 'inCinemas' | 'released' | 'preDB'
 }
 
-export class RadarrClient {
-    private readonly http: HttpClient
+export interface RadarrClientOptions {
+    url: string
+    apiKey: string
+}
 
-    constructor() {
-        this.http = new HttpClient({
-            baseUrl: config.radarr.url,
-            headers: {
-                'X-Api-Key': config.radarr.apiKey
-            }
-        })
+export class RadarrClient {
+    private _http?: HttpClient
+
+    constructor(private readonly options?: RadarrClientOptions) {}
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            const opts = this.options ?? getConfig().radarr
+            this._http = new HttpClient({
+                baseUrl: opts.url,
+                headers: {
+                    'X-Api-Key': opts.apiKey
+                }
+            })
+        }
+        return this._http
     }
 
     async lookup(term: string): Promise<RadarrMovieLookup[]> {

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { HttpClient } from './base.js'
-import { config } from '../config.js'
+import { getConfig } from '../config.js'
 
 const plexDirectorySchema = z.object({
     key: z.string(),
@@ -60,17 +60,28 @@ const plexLibraryContentsSchema = z.object({
     })
 })
 
-export class PlexClient {
-    private readonly http: HttpClient
+export interface PlexClientOptions {
+    url: string
+    token: string
+}
 
-    constructor() {
-        this.http = new HttpClient({
-            baseUrl: config.plex.url,
-            headers: {
-                'X-Plex-Token': config.plex.token,
-                Accept: 'application/json'
-            }
-        })
+export class PlexClient {
+    private _http?: HttpClient
+
+    constructor(private readonly options?: PlexClientOptions) {}
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            const opts = this.options ?? getConfig().plex
+            this._http = new HttpClient({
+                baseUrl: opts.url,
+                headers: {
+                    'X-Plex-Token': opts.token,
+                    Accept: 'application/json'
+                }
+            })
+        }
+        return this._http
     }
 
     async getLibraries(): Promise<PlexDirectory[]> {

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { HttpClient } from './base.js'
-import { config } from '../config.js'
+import { getConfig } from '../config.js'
 
 const sonarrSeriesLookupSchema = z.object({
     tvdbId: z.number(),
@@ -109,16 +109,27 @@ export interface AddSeriesOptions {
     seasons?: Array<{ seasonNumber: number; monitored: boolean }>
 }
 
-export class SonarrClient {
-    private readonly http: HttpClient
+export interface SonarrClientOptions {
+    url: string
+    apiKey: string
+}
 
-    constructor() {
-        this.http = new HttpClient({
-            baseUrl: config.sonarr.url,
-            headers: {
-                'X-Api-Key': config.sonarr.apiKey
-            }
-        })
+export class SonarrClient {
+    private _http?: HttpClient
+
+    constructor(private readonly options?: SonarrClientOptions) {}
+
+    private get http(): HttpClient {
+        if (!this._http) {
+            const opts = this.options ?? getConfig().sonarr
+            this._http = new HttpClient({
+                baseUrl: opts.url,
+                headers: {
+                    'X-Api-Key': opts.apiKey
+                }
+            })
+        }
+        return this._http
     }
 
     async lookup(term: string): Promise<SonarrSeriesLookup[]> {

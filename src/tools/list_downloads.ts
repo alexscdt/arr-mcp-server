@@ -25,19 +25,19 @@ const listDownloadsInputSchema = z.object({
 
 type ListDownloadsInput = z.infer<typeof listDownloadsInputSchema>
 
-function formatBytes(bytes: number): string {
+export function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B'
     const units = ['B', 'KB', 'MB', 'GB', 'TB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
-function formatSpeed(bytesPerSecond: number): string {
+export function formatSpeed(bytesPerSecond: number): string {
     if (bytesPerSecond === 0) return '0 B/s'
     return `${formatBytes(bytesPerSecond)}/s`
 }
 
-function formatEta(seconds: number): string {
+export function formatEta(seconds: number): string {
     if (seconds === 8640000 || seconds < 0) return '∞'
     if (seconds < 60) return `${seconds}s`
     if (seconds < 3600) return `${Math.round(seconds / 60)} min`

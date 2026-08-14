@@ -1,8 +1,6 @@
 import { config as loadEnv } from 'dotenv'
 import { z } from 'zod'
 
-loadEnv()
-
 const configSchema = z.object({
     radarr: z.object({
         url: z.string().url(),
@@ -30,6 +28,13 @@ const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>
 
+export class ConfigError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'ConfigError'
+    }
+}
+
 type RawConfig = {
     radarr: { url: string | undefined; apiKey: string | undefined }
     sonarr: { url: string | undefined; apiKey: string | undefined }
@@ -43,41 +48,47 @@ type RawConfig = {
     logLevel: string | undefined
 }
 
-function loadConfig(): Config {
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     const rawConfig: RawConfig = {
         radarr: {
-            url: process.env.RADARR_URL,
-            apiKey: process.env.RADARR_API_KEY
+            url: env.RADARR_URL,
+            apiKey: env.RADARR_API_KEY
         },
         sonarr: {
-            url: process.env.SONARR_URL,
-            apiKey: process.env.SONARR_API_KEY
+            url: env.SONARR_URL,
+            apiKey: env.SONARR_API_KEY
         },
         qbittorrent: {
-            url: process.env.QBITTORRENT_URL,
-            username: process.env.QBITTORRENT_USERNAME,
-            password: process.env.QBITTORRENT_PASSWORD
+            url: env.QBITTORRENT_URL,
+            username: env.QBITTORRENT_USERNAME,
+            password: env.QBITTORRENT_PASSWORD
         },
         plex: {
-            url: process.env.PLEX_URL,
-            token: process.env.PLEX_TOKEN
+            url: env.PLEX_URL,
+            token: env.PLEX_TOKEN
         },
         overseerr: {
-            url: process.env.OVERSEERR_URL,
-            apiKey: process.env.OVERSEERR_API_KEY
+            url: env.OVERSEERR_URL,
+            apiKey: env.OVERSEERR_API_KEY
         },
-        logLevel: process.env.LOG_LEVEL
+        logLevel: env.LOG_LEVEL
     }
 
     const parsed = configSchema.safeParse(rawConfig)
 
     if (!parsed.success) {
-        console.error('Invalid configuration:')
-        console.error(JSON.stringify(parsed.error.format(), null, 2))
-        process.exit(1)
+        throw new ConfigError(JSON.stringify(parsed.error.format(), null, 2))
     }
 
     return parsed.data
 }
 
-export const config: Config = loadConfig()
+let cachedConfig: Config | undefined
+
+export function getConfig(): Config {
+    if (!cachedConfig) {
+        loadEnv()
+        cachedConfig = loadConfig()
+    }
+    return cachedConfig
+}

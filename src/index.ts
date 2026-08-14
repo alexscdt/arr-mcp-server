@@ -11,15 +11,8 @@ import {
     type ListToolsResult
 } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
-import { config } from './config.js'
-
-import { handlePing, pingToolDefinition } from './tools/ping.js'
-import { handleSearchMovie, searchMovieToolDefinition } from './tools/search_movie.js'
-import { handleAddMovie, addMovieToolDefinition } from './tools/add_movie.js'
-import { handleSearchSeries, searchSeriesToolDefinition } from './tools/search_series.js'
-import { handleAddSeries, addSeriesToolDefinition } from './tools/add_series.js'
-import { handleListDownloads, listDownloadsToolDefinition } from './tools/list_downloads.js'
-import { handleGetLibrary, getLibraryToolDefinition } from './tools/get_library.js'
+import { getConfig, ConfigError, type Config } from './config.js'
+import { toolRegistry } from './tools/registry.js'
 
 const packageJsonSchema = z.object({
     name: z.string().min(1),
@@ -49,71 +42,24 @@ const server = new Server(
 )
 
 server.setRequestHandler(ListToolsRequestSchema, async (): Promise<ListToolsResult> => ({
-    tools: [
-        pingToolDefinition,
-        searchMovieToolDefinition,
-        addMovieToolDefinition,
-        searchSeriesToolDefinition,
-        addSeriesToolDefinition,
-        listDownloadsToolDefinition,
-        getLibraryToolDefinition
-    ]
+    tools: toolRegistry.map((tool) => tool.definition)
 }))
-
-
 
 server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToolResult> => {
     const { name, arguments: args } = request.params
 
+    const tool = toolRegistry.find((entry) => entry.definition.name === name)
+    if (!tool) {
+        return {
+            content: [{ type: 'text', text: `Unknown tool: ${name}` }],
+            isError: true
+        }
+    }
+
     try {
-        switch (name) {
-            case 'ping': {
-                const result: string = await handlePing(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'search_movie': {
-                const result: string = await handleSearchMovie(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'add_movie': {
-                const result: string = await handleAddMovie(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'search_series': {
-                const result = await handleSearchSeries(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'add_series': {
-                const result = await handleAddSeries(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'list_downloads': {
-                const result = await handleListDownloads(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            case 'get_library': {
-                const result = await handleGetLibrary(args)
-                return {
-                    content: [{ type: 'text', text: result }]
-                }
-            }
-            default:
-                return {
-                    content: [{ type: 'text', text: `Unknown tool: ${name}` }],
-                    isError: true
-                }
+        const result: string = await tool.handler(args)
+        return {
+            content: [{ type: 'text', text: result }]
         }
     } catch (error) {
         const message: string = error instanceof Error ? error.message : String(error)
@@ -125,6 +71,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToo
 })
 
 async function main(): Promise<void> {
+    let config: Config
+    try {
+        config = getConfig()
+    } catch (error) {
+        if (error instanceof ConfigError) {
+            console.error('Invalid configuration:')
+            console.error(error.message)
+            process.exit(1)
+        }
+        throw error
+    }
+
     const transport = new StdioServerTransport()
     await server.connect(transport)
     console.error(`${pkg.name} v${pkg.version} started (log level: ${config.logLevel})`)
