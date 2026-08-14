@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.0...v1.0.1) (2026-08-14)
+
+
+### Bug Fixes
+
+* preserve shebang and make dist/index.js executable ([3b02158](https://github.com/alexscdt/arr-mcp-server/commit/3b02158dfb99337ae081c1f2f096168da52fc2b3))
+
 ## 1.0.0 (2026-08-14)
 
 
