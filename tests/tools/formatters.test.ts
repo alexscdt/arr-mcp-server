@@ -30,4 +30,10 @@ describe('formatEta', () => {
         expect(formatEta(120)).toBe('2 min')
         expect(formatEta(5400)).toBe('1h 30min')
     })
+
+    it('rolls over to hours when minutes round up to 60', () => {
+        expect(formatEta(3570)).toBe('1h 0min')
+        expect(formatEta(3599)).toBe('1h 0min')
+        expect(formatEta(3540)).toBe('59 min')
+    })
 })

@@ -40,9 +40,10 @@ export function formatSpeed(bytesPerSecond: number): string {
 export function formatEta(seconds: number): string {
     if (seconds === 8640000 || seconds < 0) return '∞'
     if (seconds < 60) return `${seconds}s`
-    if (seconds < 3600) return `${Math.round(seconds / 60)} min`
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.round((seconds % 3600) / 60)
+    const totalMinutes = Math.round(seconds / 60)
+    if (totalMinutes < 60) return `${totalMinutes} min`
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
     return `${hours}h ${minutes}min`
 }
 
@@ -74,7 +75,7 @@ export async function handleListDownloads(args: unknown): Promise<string> {
 
     const activeTorrents = torrents.filter((t) => t.progress < 1 || input.includeCompleted)
     const seedingTorrents = torrents.filter(
-        (t) => t.progress >= 1 && t.state.includes('UP')
+        (t) => t.progress >= 1 && (t.state === 'uploading' || t.state.endsWith('UP'))
     )
 
     if (activeTorrents.length > 0) {
