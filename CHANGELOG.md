@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.2...v1.0.3) (2026-08-15)
+
+
+### Bug Fixes
+
+* copy tsconfig.build.json and scripts into docker build stage ([055d34c](https://github.com/alexscdt/arr-mcp-server/commit/055d34c18520eac49e715e23477084fd46def158))
+
 ## [1.0.2](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.1...v1.0.2) (2026-08-14)
 
 

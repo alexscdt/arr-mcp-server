@@ -1,22 +1,17 @@
 manifest_version: 1
-
 name: arr-media-stack
-version: "1.0.2" # x-release-please-version
+version: 1.0.3
 description: >-
   Manage a self-hosted media stack (Radarr, Sonarr, qBittorrent, Plex,
-  Overseerr) from Hermes — search and add movies/series, track downloads
-  across qBittorrent and *arr queues, and browse the Plex library.
-
+  Overseerr) from Hermes — search and add movies/series, track downloads across
+  qBittorrent and *arr queues, and browse the Plex library.
 source: https://github.com/alexscdt/arr-mcp-server
 author: alexscdt
 license: MIT
-
 bootstrap:
-  - "npm install -g arr-mcp-server"
-
+  - npm install -g arr-mcp-server
 transport:
   command: arr-mcp-server
-
 env:
   - RADARR_URL
   - RADARR_API_KEY
@@ -29,7 +24,6 @@ env:
   - PLEX_TOKEN
   - OVERSEERR_URL
   - OVERSEERR_API_KEY
-
 tools:
   default_enabled:
     - search_movie
@@ -38,7 +32,6 @@ tools:
     - add_series
     - list_downloads
     - get_library
-
 setup_notes: |
   This server manages a RUNNING self-hosted media stack that Hermes's host
   must reach over the network. It does not install or host any of the
