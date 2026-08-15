@@ -33,4 +33,18 @@ describe('loadConfig', () => {
     it('throws ConfigError on a malformed URL', () => {
         expect(() => loadConfig({ ...validEnv, PLEX_URL: 'not-a-url' })).toThrow(ConfigError)
     })
+
+    it('throws ConfigError on an empty API key', () => {
+        expect(() => loadConfig({ ...validEnv, SONARR_API_KEY: '' })).toThrow(ConfigError)
+    })
+
+    it('accepts an explicit valid LOG_LEVEL', () => {
+        const config = loadConfig({ ...validEnv, LOG_LEVEL: 'debug' })
+
+        expect(config.logLevel).toBe('debug')
+    })
+
+    it('throws ConfigError on an invalid LOG_LEVEL', () => {
+        expect(() => loadConfig({ ...validEnv, LOG_LEVEL: 'verbose' })).toThrow(ConfigError)
+    })
 })
