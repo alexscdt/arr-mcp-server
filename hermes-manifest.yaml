@@ -1,6 +1,6 @@
 manifest_version: 1
 name: arr-media-stack
-version: 1.0.3
+version: 1.0.3 # x-release-please-version # x-release-please-version
 description: >-
   Manage a self-hosted media stack (Radarr, Sonarr, qBittorrent, Plex,
   Overseerr) from Hermes — search and add movies/series, track downloads across
@@ -22,6 +22,7 @@ env:
   - QBITTORRENT_PASSWORD
   - PLEX_URL
   - PLEX_TOKEN
+  # Optional — see setup_notes:
   - OVERSEERR_URL
   - OVERSEERR_API_KEY
 tools:
@@ -51,9 +52,9 @@ setup_notes: |
     - qBittorrent: your Web UI username and password
     - Plex token: see the "Getting a Plex token" section of the README
 
-  The Overseerr variables are validated at startup but not yet used by any
-  tool (reserved for upcoming request/discovery features) — provide a valid
-  URL and key from your instance.
+  The Overseerr variables are OPTIONAL: no tool uses Overseerr yet (reserved
+  for upcoming request/discovery features). Leave both unset if you don't run
+  it; if you set one, both must be provided and valid.
 
   Full setup guide, tool reference, and troubleshooting:
   https://github.com/alexscdt/arr-mcp-server#readme
