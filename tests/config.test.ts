@@ -47,4 +47,19 @@ describe('loadConfig', () => {
     it('throws ConfigError on an invalid LOG_LEVEL', () => {
         expect(() => loadConfig({ ...validEnv, LOG_LEVEL: 'verbose' })).toThrow(ConfigError)
     })
+
+    it('parses without any Overseerr variables (optional service)', () => {
+        const { OVERSEERR_URL: _url, OVERSEERR_API_KEY: _key, ...env } = validEnv
+
+        const config = loadConfig(env)
+
+        expect(config.overseerr).toBeUndefined()
+        expect(config.radarr.url).toBe('http://localhost:7878')
+    })
+
+    it('throws ConfigError when Overseerr is only half-configured', () => {
+        const { OVERSEERR_API_KEY: _key, ...env } = validEnv
+
+        expect(() => loadConfig(env)).toThrow(ConfigError)
+    })
 })

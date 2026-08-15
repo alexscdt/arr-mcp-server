@@ -19,10 +19,12 @@ const configSchema = z.object({
         url: z.string().url(),
         token: z.string().min(1)
     }),
-    overseerr: z.object({
-        url: z.string().url(),
-        apiKey: z.string().min(1)
-    }),
+    overseerr: z
+        .object({
+            url: z.string().url(),
+            apiKey: z.string().min(1)
+        })
+        .optional(),
     logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info')
 })
 
@@ -44,7 +46,7 @@ type RawConfig = {
         password: string | undefined
     }
     plex: { url: string | undefined; token: string | undefined }
-    overseerr: { url: string | undefined; apiKey: string | undefined }
+    overseerr: { url: string | undefined; apiKey: string | undefined } | undefined
     logLevel: string | undefined
 }
 
@@ -67,10 +69,16 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
             url: env.PLEX_URL,
             token: env.PLEX_TOKEN
         },
-        overseerr: {
-            url: env.OVERSEERR_URL,
-            apiKey: env.OVERSEERR_API_KEY
-        },
+        // Overseerr is optional until Overseerr tools ship: omit the block
+        // entirely when neither variable is set, but validate both when
+        // either one is provided (a half-configured Overseerr is an error).
+        overseerr:
+            env.OVERSEERR_URL === undefined && env.OVERSEERR_API_KEY === undefined
+                ? undefined
+                : {
+                    url: env.OVERSEERR_URL,
+                    apiKey: env.OVERSEERR_API_KEY
+                },
         logLevel: env.LOG_LEVEL
     }
 
