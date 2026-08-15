@@ -6,29 +6,44 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![node](https://img.shields.io/node/v/arr-mcp-server)](https://nodejs.org)
 
+## Demo
+
+<!--
+  TODO: Record a GIF of Pablo (Hermes Discord bot) adding a movie via natural language.
+  Suggested tools: Kap (macOS) or Peek (Linux). Compress with gifsicle before commit.
+  Target size: under 2MB, under 30 seconds, showing user query → Pablo response → movie appearing in Radarr.
+-->
+
+*Demo GIF coming soon.*
+
 `arr-mcp-server` is a [Model Context Protocol](https://modelcontextprotocol.io) server that exposes your homelab media stack as a set of tools any MCP client can call. Connect it to Claude Desktop, Hermes Agent, Cursor, or any other MCP-compatible client, and manage your library conversationally: *"add the latest Denis Villeneuve movie in 4K"*, *"what's downloading right now?"*, *"is Severance already on my Plex?"*.
 
-**Why this exists:** running a \*arr stack means juggling four or five web UIs to do one simple thing — find a title, check quality profiles, add it, watch the download queue, verify it landed in Plex. This server collapses that whole workflow into a conversation. The AI client handles the orchestration (search → pick the right match → add → monitor); you just say what you want.
+**Why this exists:** running a \*arr stack means juggling four or five web UIs to do one simple thing — find a title, check quality profiles, add it, watch the download queue, verify it landed in Plex. This server collapses that whole workflow into a conversation: instead of clicking through Radarr, Sonarr and Overseerr, you tell your assistant *"Pablo, add Anora to my library"* or *"what's downloading?"* — from Discord, Claude Desktop, or wherever your assistant lives. The AI client handles the orchestration (search → pick the right match → add → monitor); you just say what you want.
 
 ## ✨ Features
 
-- **Search movies and TV series** by title via Radarr and Sonarr lookups (TMDB / TVDB metadata, ratings, overviews)
-- **Add movies to Radarr** with quality profile selection and automatic release search
-- **Add series to Sonarr** with monitoring options (all seasons, future only, first season, …)
-- **Unified download view** — active torrents in qBittorrent grouped by category, plus Radarr/Sonarr import queues and errors, in one consolidated report
-- **Browse your Plex library** — library overview with item counts, recently added, or search across movies/shows/episodes
-- **Fail-fast configuration** — all credentials validated with Zod at startup, with clear error messages
-- **Stdio transport** — works with every MCP client that can spawn a local process
+Seven MCP tools, all validated with Zod:
+
+- **`search_movie`** — search a movie by title via Radarr (TMDB metadata, ratings, overview)
+- **`add_movie`** — add a movie to Radarr and trigger a release search, with quality profile selection
+- **`search_series`** — search a TV series by title via Sonarr (TVDB metadata, network, status)
+- **`add_series`** — add a series to Sonarr with monitoring options (all seasons, future only, latest season, …)
+- **`list_downloads`** — consolidated view of active downloads across qBittorrent, Radarr and Sonarr queues (progress, speed, ETA, import status, errors)
+- **`get_library`** — browse the Plex library: overview with item counts, recently added, or title search
+- **`ping`** — verify the server is responding
+
+## Supported services
+
+- [Radarr](https://radarr.video/) — movie collection manager
+- [Sonarr](https://sonarr.tv/) — TV series collection manager
+- [qBittorrent](https://www.qbittorrent.org/) — download client (Web UI)
+- [Plex Media Server](https://www.plex.tv/) — media library
+- [Overseerr](https://overseerr.dev/) — request management (config required; tools coming — see note in [Configuration](#%EF%B8%8F-configuration))
 
 ## Requirements
 
 - **Node.js >= 20**
-- Running, network-reachable instances of:
-  - [Radarr](https://radarr.video/)
-  - [Sonarr](https://sonarr.tv/)
-  - [qBittorrent](https://www.qbittorrent.org/) (Web UI enabled)
-  - [Plex Media Server](https://www.plex.tv/)
-  - [Overseerr](https://overseerr.dev/) (required by config validation — see note in [Configuration](#%EF%B8%8F-configuration))
+- Running instances of the supported services above, network-reachable from the machine running the MCP server
 - API keys / credentials for each service
 
 ## 📦 Installation
@@ -83,6 +98,14 @@ All configuration is done through environment variables (a `.env` file in the wo
 
 > **Note on Overseerr:** the Overseerr variables are currently required by config validation, but no tool uses Overseerr yet — it is reserved for upcoming request/discovery features. Point them at your instance (or any valid URL + non-empty key) for now.
 
+### Getting a Plex token
+
+Three common ways to find your `PLEX_TOKEN`:
+
+1. **Browser DevTools** — log in to [app.plex.tv](https://app.plex.tv), open DevTools → Network tab, and look for the `X-Plex-Token` query parameter on any request (or inspect the XML of a media item via "Get Info" → "View XML" — the token is in the URL). Full walkthrough in the [official Plex support article](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
+2. **Via Overseerr** — if you already run Overseerr, it stores the Plex token it uses under Settings → Plex.
+3. **Via the Plex API** — request a PIN with your credentials against `https://plex.tv/pins.xml` and exchange it for a token (useful for scripted setups).
+
 ## 🚀 Usage
 
 ### Claude Desktop
@@ -115,6 +138,8 @@ Add this to your `claude_desktop_config.json` (Settings → Developer → Edit C
 Restart Claude Desktop; the tools appear under the 🔌 icon.
 
 ### Hermes Agent
+
+The repo ships a [`hermes-manifest.yaml`](hermes-manifest.yaml) as the canonical reference for configuring this server with Hermes — it documents the transport, every environment variable with its prompt and default, and setup notes. (The official Hermes MCP catalog is curated, so this file lives here as reference documentation for manual configuration.)
 
 Add this under `mcp_servers` in `~/.hermes/config.yaml` (credentials go in `~/.hermes/.env` or your environment):
 
@@ -246,3 +271,7 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for th
 - [Model Context Protocol](https://modelcontextprotocol.io) by Anthropic — the spec and TypeScript SDK this server is built on
 - [LinuxServer.io](https://www.linuxserver.io/) — the container images most of us run our media stacks on
 - The [Radarr](https://radarr.video/), [Sonarr](https://sonarr.tv/) and wider \*arr community for the excellent APIs and documentation
+
+## Where to find this MCP
+
+- **npm** — https://www.npmjs.com/package/arr-mcp-server

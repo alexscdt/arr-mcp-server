@@ -36,14 +36,18 @@
   "keywords": [
     "mcp",
     "modelcontextprotocol",
+    "mcp-server",
     "radarr",
     "sonarr",
     "plex",
+    "plex-server",
     "qbittorrent",
     "overseerr",
     "homelab",
     "media-server",
-    "automation"
+    "automation",
+    "self-hosted",
+    "arr-stack"
   ],
   "author": "alexscdt",
   "license": "MIT",
