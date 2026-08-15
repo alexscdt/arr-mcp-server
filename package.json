@@ -1,6 +1,7 @@
 {
   "name": "arr-mcp-server",
   "version": "1.0.2",
+  "mcpName": "arr-media-stack",
   "description": "MCP server for managing a self-hosted media stack (Radarr, Sonarr, qBittorrent, Plex, Overseerr)",
   "main": "dist/index.js",
   "type": "module",
@@ -34,12 +35,15 @@
   ],
   "keywords": [
     "mcp",
+    "modelcontextprotocol",
     "radarr",
     "sonarr",
     "plex",
     "qbittorrent",
     "overseerr",
-    "homelab"
+    "homelab",
+    "media-server",
+    "automation"
   ],
   "author": "alexscdt",
   "license": "MIT",
