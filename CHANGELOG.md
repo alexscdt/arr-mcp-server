@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.3...v1.1.0) (2026-08-15)
+
+
+### Features
+
+* make overseerr configuration optional ([78319c3](https://github.com/alexscdt/arr-mcp-server/commit/78319c34a6b6b84cc47c3760a1b35baa7104377f))
+
 ## [1.0.3](https://github.com/alexscdt/arr-mcp-server/compare/v1.0.2...v1.0.3) (2026-08-15)
 
 
