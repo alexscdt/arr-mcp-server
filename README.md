@@ -38,7 +38,7 @@ Seven MCP tools, all validated with Zod:
 - [Sonarr](https://sonarr.tv/) — TV series collection manager
 - [qBittorrent](https://www.qbittorrent.org/) — download client (Web UI)
 - [Plex Media Server](https://www.plex.tv/) — media library
-- [Overseerr](https://overseerr.dev/) — request management (config required; tools coming — see note in [Configuration](#%EF%B8%8F-configuration))
+- [Overseerr](https://overseerr.dev/) — request management (optional; tools coming — see note in [Configuration](#%EF%B8%8F-configuration))
 
 ## Requirements
 
@@ -92,11 +92,11 @@ All configuration is done through environment variables (a `.env` file in the wo
 | `QBITTORRENT_PASSWORD` | Yes | qBittorrent Web UI password | `adminadmin` |
 | `PLEX_URL` | Yes | Base URL of your Plex Media Server | `http://127.0.0.1:32400` |
 | `PLEX_TOKEN` | Yes | Plex authentication token ([how to find it](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)) | `xxxxxxxxxxxx` |
-| `OVERSEERR_URL` | Yes | Base URL of your Overseerr instance | `http://127.0.0.1:5055` |
-| `OVERSEERR_API_KEY` | Yes | Overseerr API key (Settings → General) | `MTxxxxxxxxxx…` |
+| `OVERSEERR_URL` | No* | Base URL of your Overseerr instance | `http://127.0.0.1:5055` |
+| `OVERSEERR_API_KEY` | No* | Overseerr API key (Settings → General) | `MTxxxxxxxxxx…` |
 | `LOG_LEVEL` | No | Log level: `debug`, `info`, `warn`, `error` (default: `info`) | `info` |
 
-> **Note on Overseerr:** the Overseerr variables are currently required by config validation, but no tool uses Overseerr yet — it is reserved for upcoming request/discovery features. Point them at your instance (or any valid URL + non-empty key) for now.
+> **\*Note on Overseerr:** Overseerr is optional — no tool uses it yet (reserved for upcoming request/discovery features), so you can leave both variables unset and the server starts fine without it. If you set one of the two, both must be provided and valid.
 
 ### Getting a Plex token
 
@@ -105,6 +105,16 @@ Three common ways to find your `PLEX_TOKEN`:
 1. **Browser DevTools** — log in to [app.plex.tv](https://app.plex.tv), open DevTools → Network tab, and look for the `X-Plex-Token` query parameter on any request (or inspect the XML of a media item via "Get Info" → "View XML" — the token is in the URL). Full walkthrough in the [official Plex support article](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 2. **Via Overseerr** — if you already run Overseerr, it stores the Plex token it uses under Settings → Plex.
 3. **Via the Plex API** — request a PIN with your credentials against `https://plex.tv/pins.xml` and exchange it for a token (useful for scripted setups).
+
+## 🔒 Security
+
+This server holds credentials for your entire media stack — treat its configuration accordingly:
+
+- **Never commit `.env`** — it is already in `.gitignore`; keep it that way. Prefer passing secrets through your MCP client's `env` block or your shell environment rather than files synced to cloud storage.
+- **API keys are admin keys** — Radarr/Sonarr/Overseerr API keys grant full control of those apps (delete media, change settings). Treat them like passwords and rotate them if leaked.
+- **The Plex token grants access to your Plex account**, not just the library. If you share your setup, consider a [managed user](https://support.plex.tv/articles/203948776-managed-users/) with restricted permissions; you can revoke tokens anytime by signing out devices in your Plex account settings.
+- **Do not expose qBittorrent's Web UI to the internet.** Keep all services on your LAN or behind a VPN (WireGuard, Tailscale, …). The MCP server only needs to reach them from inside — run it on the same network as the stack.
+- The server makes requests only to the services you configure; there is no telemetry and nothing leaves your network except through your MCP client.
 
 ## 🚀 Usage
 
