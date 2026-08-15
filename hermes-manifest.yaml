@@ -1,0 +1,68 @@
+manifest_version: 1
+
+name: arr-media-stack
+version: "1.0.2" # x-release-please-version
+description: >-
+  Manage a self-hosted media stack (Radarr, Sonarr, qBittorrent, Plex,
+  Overseerr) from Hermes — search and add movies/series, track downloads
+  across qBittorrent and *arr queues, and browse the Plex library.
+
+source: https://github.com/alexscdt/arr-mcp-server
+author: alexscdt
+license: MIT
+
+bootstrap:
+  - "npm install -g arr-mcp-server"
+
+transport:
+  command: arr-mcp-server
+
+env:
+  - RADARR_URL
+  - RADARR_API_KEY
+  - SONARR_URL
+  - SONARR_API_KEY
+  - QBITTORRENT_URL
+  - QBITTORRENT_USERNAME
+  - QBITTORRENT_PASSWORD
+  - PLEX_URL
+  - PLEX_TOKEN
+  - OVERSEERR_URL
+  - OVERSEERR_API_KEY
+
+tools:
+  default_enabled:
+    - search_movie
+    - add_movie
+    - search_series
+    - add_series
+    - list_downloads
+    - get_library
+
+setup_notes: |
+  This server manages a RUNNING self-hosted media stack that Hermes's host
+  must reach over the network. It does not install or host any of the
+  underlying services.
+
+  Required services:
+    - Radarr (movies)         https://radarr.video
+    - Sonarr (TV shows)       https://sonarr.tv
+    - qBittorrent (Web UI)    https://www.qbittorrent.org
+    - Plex Media Server       https://www.plex.tv
+    - Overseerr (request UI)  https://overseerr.dev
+
+  Node.js >= 20 is required for the npm-installed binary.
+
+  Where to find each credential:
+    - Radarr / Sonarr / Overseerr API keys: Settings → General → Security
+    - qBittorrent: your Web UI username and password
+    - Plex token: see the "Getting a Plex token" section of the README
+
+  The Overseerr variables are validated at startup but not yet used by any
+  tool (reserved for upcoming request/discovery features) — provide a valid
+  URL and key from your instance.
+
+  Full setup guide, tool reference, and troubleshooting:
+  https://github.com/alexscdt/arr-mcp-server#readme
+
+  Restart your Hermes session after install so the tools load.
