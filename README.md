@@ -8,13 +8,9 @@
 
 ## Demo
 
-<!--
-  TODO: Record a GIF of Pablo (Hermes Discord bot) adding a movie via natural language.
-  Suggested tools: Kap (macOS) or Peek (Linux). Compress with gifsicle before commit.
-  Target size: under 2MB, under 30 seconds, showing user query → Pablo response → movie appearing in Radarr.
--->
+![Pablo (Hermes Discord bot) responding to a natural-language query about active downloads, using arr-mcp-server under the hood](./docs/demo.gif)
 
-*Demo GIF coming soon.*
+*Pablo (a Discord bot running Hermes Agent) responds to a natural-language query about active downloads. Behind the scenes, Hermes calls the `list_downloads` tool exposed by `arr-mcp-server`, which aggregates state from qBittorrent, Radarr, and Sonarr into a single readable response.*
 
 `arr-mcp-server` is a [Model Context Protocol](https://modelcontextprotocol.io) server that exposes your homelab media stack as a set of tools any MCP client can call. Connect it to Claude Desktop, Hermes Agent, Cursor, or any other MCP-compatible client, and manage your library conversationally: *"add the latest Denis Villeneuve movie in 4K"*, *"what's downloading right now?"*, *"is Severance already on my Plex?"*.
 
